@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+{{>header}}
+<body>
+    {{>navbar}}
+    
+    <div class="container">
+        <h2>Registration Form</h2>
+        <form action="/register" method="POST">
+            <input type="text" name="first_name" placeholder="First Name" >
+            <input type="text" name="lastname" placeholder="Last Name" >
+            <input type="email" name="email" placeholder="Email" >
+            <input type="tel" name="phone" placeholder="Phone Number" >
+            <input type="radio" id="html" name="gender" value="Male">
+            <label for="html">Male</label>
+            <input type="radio" id="css" name="gender" value="Female">
+            <label for="css">Female</label><br>
+           <input type="number" name="age" placeholder="Your Age" >
+            <input type="password" name="password" placeholder="Password" >
+            <input type="password" name="confirmPassword" placeholder="Confirm Password" >
+            <input type="submit" src="/" value="Register">
+        </form>
+    </div>
+
+    
+</body>
+</html>

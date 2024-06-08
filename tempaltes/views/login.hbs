@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+{{>header}}
+<body>
+    {{>navbar}}
+     <div class="container">
+        <h2>Login Form</h2>
+        <form action="/login" method="post">
+            <input type="text" name="email" placeholder="Username" >
+            <input type="password" name="password" placeholder="Password" >
+            <input type="submit" value="Login">
+        </form>
+        <div class="remember">
+        <label for="">
+            <input type="checkboc" style="width: 15px; height: 15px"> remember-me
+        </label>
+        <a href="" class=""> Need help ?</a>
+</div>
+<a href="/register" class="create"> Create an account</a>
+    </div>
+
+</body>
+</html>
