@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const monogoURL = "mongodb://127.0.0.1:27017/yotubeRegistration"
+const monogoURL = process.env.MONGO_URL
 
 
 mongoose.connect(monogoURL).then(()=>{
