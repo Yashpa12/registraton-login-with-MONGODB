@@ -1,4 +1,4 @@
-require('dotenv').config()
+require("dotenv").config();
 
 const express = require("express");
 const app = express();
@@ -8,10 +8,12 @@ const hbs = require("hbs");
 const PORT = process.env.PORT || 3000;
 const Register = require("./models/registers");
 const bcrypt = require("bcrypt");
-const { ChildProcess } = require("child_process");
+// const { ChildProcess } = require("child_process");
 const Filepath = path.join(__dirname, "./public");
 const template_path = path.join(__dirname, "../tempaltes/views");
 const partial_path = path.join(__dirname, "../tempaltes/partial");
+const cookieParser = require("cookie-parser");
+const auth = require("./middleware/auth");
 
 console.log(Filepath);
 // to set the hbs
@@ -24,18 +26,25 @@ app.set("views", template_path);
 app.use(express.json());
 //for form
 app.use(express.urlencoded({ extended: false }));
+//cookie parser
+
+app.use(cookieParser());
 
 // to register the partial file of the path
 hbs.registerPartials(partial_path);
 
-
-console.log(process.env.SECRET_KEY)
+console.log(process.env.SECRET_KEY);
 
 // app.get("/", (req, res) => {
 //   res.render("index"); // its the file name of the views folder
 // });
 app.get("/", (req, res) => {
   res.render("index"); // its the file name of the views folder
+});
+
+app.get("/secret", auth, (req, res) => {
+  // console.log(`this is cookie ${req.cookies.jwt}`);
+  res.render("secret");
 });
 
 app.get("/register", (req, res) => {
@@ -60,7 +69,18 @@ app.post("/register", async (req, res) => {
       });
 
       const token = await registerEmp.generateToken();
-        console.log(token)
+      // console.log(token)
+
+      // now get token to store on the cookies
+      // res.cookie() function used to  set cookie name to value
+      // the value may be string or object converted To JSON
+      //syntax : res.cookie(name , value , [Option])
+
+      res.cookie("jwt", token, {
+        expires: new Date(Date.now() + 600000),
+        httpOnly: true,
+      });
+      console.log(cookie);
 
       // password hash : its called middlewarwe means concept of the two bwtween entities
 
@@ -74,6 +94,8 @@ app.post("/register", async (req, res) => {
     res.status(400).send(err);
   }
 });
+
+// login check
 
 app.get("/login", (req, res) => {
   res.render("login");
@@ -90,9 +112,16 @@ app.post("/login", async (req, res) => {
     // login time password match
     const ismatch = await bcrypt.compare(password, loginData.password); //first argument password is enter during login by the user and second password is store in db in form of bcrypt
 
+    // jwt
     const token = await loginData.generateToken();
-    console.log(token)
+    // console.log(token);
 
+    // cookie :  jwt is name of cookie
+
+    res.cookie("jwt", token, {
+      expires: new Date(Date.now() + 600000),
+      httpOnly: true,
+    });
 
     if (ismatch) {
       res.status(201).render("index");
@@ -101,6 +130,29 @@ app.post("/login", async (req, res) => {
     }
   } catch (err) {
     res.status(400).send("invalid login details ");
+  }
+});
+
+app.get("/logout", auth, async (req, res) => {
+  try {
+    // to clear cookie
+    console.log(req.user);
+
+    //for the single logout
+    // req.user.tokens = req.user.tokens.filter((currToken)=>{
+    //   return currToken.token  !== req.token
+    // })
+
+    // now logout from all device
+
+    req.user.tokens = []
+
+    res.clearCookie("jwt");
+    console.log("logout here ");
+    await req.user.save();
+    res.render("login");
+  } catch (err) {
+    res.status(401).send(err);
   }
 });
 
